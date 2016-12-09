@@ -4,16 +4,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author boreas
  */
-public class NetworkWriter {
+public class NetworkWriter implements AutoCloseable{
     
-    private final OutputStream stream;
+    private OutputStream stream;
     
     private static final byte NEWLINE = '\n';
+    
+    private static final Logger LOGGER = Logger.getLogger(NetworkWriter.class);
     
     public NetworkWriter(OutputStream stream){
         this.stream = stream;
@@ -48,5 +51,20 @@ public class NetworkWriter {
         stream.write(NEWLINE);
         writeHeaders(message.getHeaders());
         writeBody(message.getContent());
+    }
+
+    @Override
+    public void close() throws Exception {
+        try{
+            if(stream != null){
+                stream.close();
+            }
+        }
+        catch(Exception ex){
+            LOGGER.warn("error while closing the input stream.", ex);
+        }
+        finally{
+            stream = null;
+        }
     }
 }

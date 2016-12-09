@@ -1,5 +1,6 @@
 package de.fomad.siglib.network;
 
+import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,18 +8,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author boreas
  */
-public class NetworkReader {
+public class NetworkReader implements AutoCloseable{
     
-    private final InputStream stream;
+    private InputStream stream;
     
     private static final int MAX_LINE_LENGTH = 256;
     
     private static final int MAX_CONTENT_LENGTH = 12000;
+    
+    private static final Logger LOGGER = Logger.getLogger(NetworkReader.class);
     
     public NetworkReader(InputStream stream){
         this.stream = stream;
@@ -80,5 +84,20 @@ public class NetworkReader {
             headers.add(header);
         }
         return headers;
+    }
+
+    @Override
+    public void close() throws IOException {
+        try{
+            if(stream != null){
+                stream.close();
+            }
+        }
+        catch(Exception ex){
+            LOGGER.warn("error while closing the input stream.", ex);
+        }
+        finally{
+            stream = null;
+        }
     }
 }

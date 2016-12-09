@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 /**
  * @author boreas
  */
-public class NetworkWriterQueue implements Runnable {
+public class NetworkWriterQueue implements Runnable, AutoCloseable {
     
     private static final Logger LOGGER = LogManager.getLogger(NetworkWriterQueue.class);
     
@@ -45,6 +45,13 @@ public class NetworkWriterQueue implements Runnable {
         }
         finally {
             LOGGER.info("message queue terminated.");
+        }
+    }
+
+    @Override
+    public void close() throws Exception {
+        if(writer != null){
+            writer.close();
         }
     }
 }
